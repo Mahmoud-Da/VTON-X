@@ -1,73 +1,105 @@
-# CP-VTON+ (CVPRW 2020)
-Official implementation for "CP-VTON+: Clothing Shape and Texture Preserving Image-Based Virtual Try-On" from CVPRW 2020.
-<br/>Project page: https://minar09.github.io/cpvtonplus/. 
-<br/>Saved/Pre-trained models: [Checkpoints](https://1drv.ms/u/c/5435770760f02d2f/ES8t8GAHdzUggFSABAAAAAAB5ArDGoOr2-DU2pyW7NmH-g?e=7ZUxRA)
-<br/>Dataset: [VITON_PLUS](https://1drv.ms/u/c/5435770760f02d2f/ES8t8GAHdzUggFSEBAAAAAABdOEe5WT0SPidEIqFG-ys-Q?e=qGt3BA)
-<br/>The code and pre-trained models are tested with pytorch 0.4.1, torchvision 0.2.1, opencv-python 4.1 and pillow 5.4 (Python 3 env).
-<br/><br/>
-[Project page](https://minar09.github.io/cpvtonplus/) | [Paper](https://minar09.github.io/cpvtonplus/cvprw20_cpvtonplus.pdf) | [Dataset](https://1drv.ms/u/c/5435770760f02d2f/ES8t8GAHdzUggFSEBAAAAAABdOEe5WT0SPidEIqFG-ys-Q?e=qGt3BA) | [Model](https://1drv.ms/u/c/5435770760f02d2f/ES8t8GAHdzUggFSABAAAAAAB5ArDGoOr2-DU2pyW7NmH-g?e=7ZUxRA) | [Video](https://www.youtube.com/watch?v=MPB_PYLOfd8)
-<br/><br/>
-	
-## Usage
-This pipeline combines consecutive training and testing of GMM and TOM. GMM generates the warped clothes according to the target human. Then, TOM blends the warped clothes outputs from GMM into the target human properties to generate the final try-on output.
+# VTON-X: A Modernized Virtual Try-On Project
 
-1) Install the requirements
-2) Download/Prepare the dataset
-3) Train GMM network
-4) Get warped clothes for the training set with a trained GMM network, and copy warped clothes & masks inside the `data/train` directory
-5) Train TOM network
-6) Test GMM for the testing set
-7) Get warped clothes for the testing set, copy warped clothes & masks inside the `data/test` directory
-8) Test TOM testing set
+> **Note:** This project is a customized and modernized fork of the official [CP-VTON+ (CVPRW 2020)](https://github.com/minar09/cp-vton-plus) implementation. All credit for the core research and model architecture belongs to the original authors.
 
-## Installation
-This implementation is built and tested in PyTorch 0.4.1.
-Pytorch and torchvision are recommended to install with conda: `conda install pytorch=0.4.1 torchvision=0.2.1 -c pytorch`
-<br/>For all packages, run `pip install -r requirements.txt`
+This repository, **VTON-X**, aims to make the powerful CP-VTON+ model more accessible and easier to set up by leveraging modern Python development tools and providing a streamlined process for testing and inference.
 
-## Data Preparation
-For training/testing VITON dataset, our full and processed dataset is available here: https://1drv.ms/u/s!Ai8t8GAHdzVUiQRFmTPrtrAy0ZP5?e=rS1aK8. After downloading, unzip to your data directory.
+[Original Project Page](https://minar09.github.io/cpvtonplus/) | [Original Paper](https://minar09.github.io/cpvtonplus/cvprw20_cpvtonplus.pdf)
 
-## Training
-Run `python train.py` with your specific usage options for the GMM and TOM stage.
-<br/>For example, GMM: ```python train.py --name GMM --stage GMM --workers 4 --save_count 5000 --shuffle```
-<br/> Then run test.py for GMM network with the training dataset, which will generate the warped clothes and masks in the "warp-cloth" and "warp-mask" folders inside the "result/GMM/train/" directory. Copy the "warp-cloth" and "warp-mask" folders into your data directory, for example inside the "data/train" folder.
-<br/>Run TOM stage, ```python train.py --name TOM --stage TOM --workers 4 --save_count 5000 --shuffle```
+---
 
-## Testing
-Run 'python test.py' with your specific usage options.
-<br/>For example, GMM: ```python test.py --name GMM --stage GMM --workers 4 --datamode test --data_list test_pairs.txt --checkpoint checkpoints/GMM/gmm_final.pth```
-<br/> Then run test.py for GMM network with the testing dataset, which will generate the warped clothes and masks in the "warp-cloth" and "warp-mask" folders inside the "result/GMM/test/" directory. Copy the "warp-cloth" and "warp-mask" folders into your data directory, for example inside the "data/test" folder.
-<br/>Run TOM stage: ```python test.py --name TOM --stage TOM --workers 4 --datamode test --data_list test_pairs.txt --checkpoint checkpoints/TOM/tom_final.pth```
+## What's New in VTON-X?
 
-## Inference/Demo
-Download the pre-trained models from here: https://1drv.ms/u/s!Ai8t8GAHdzVUiQA-o3C7cnrfGN6O?e=EaRiFP.
-Then run the same step as Testing to test/infer our model.
-The code and pre-trained models are tested with PyTorch 0.4.1, torchvision 0.2.1, opencv 4.1 and pillow 5.4.
+This fork focuses on improving the developer experience and modernizing the project's foundation. Key changes include:
 
-### Testing with custom images
-to run the model with custom internet images, make sure you have the following:
+- **Modern Dependency Management:** Uses **`pipenv`** for robust, reproducible environments, replacing the `requirements.txt` file.
+- **Updated Libraries:** Configured to work with newer library versions, including `PyTorch >= 1.10` and `Torchvision >= 0.11`.
+- **Simplified Setup:** A clear, step-by-step guide to get the demo running in minutes.
+- **Focus on Inference:** The primary goal of this fork is to make it easy to run the pre-trained models on new images.
 
-1) image (image of a person, crop/resize to 192 x 256 (width x height) pixels)
-2) image-parse (you can generate with CIHP_PGN or Graphonomy pretrained networks from the person image. See this [comment](https://github.com/minar09/cp-vton-plus/issues/15#issuecomment-683403388))
-3) cloth (in-shop cloth image, crop/resize to 192 x 256 (width x height) pixels)
-4) cloth-mask (binary mask of cloth image, you can generate it with simple pillow/opencv function)
-5) pose (pose keypoints of the person, generate with openpose COCO-18 model (OpenPose from the official repository is preferred))
-6) Also, make a test_pairs.txt file for your custom images. Follow the VITON dataset format to keep same arrangements, otherwise you can modify the code.
+## Quickstart: Run the Demo
 
-### What to do in case of unexpected results
-There are many factors that can cause distorted/unexpected results. Can you please do the following?
+Get the virtual try-on running with just a few commands.
 
-1) First try the original viton dataset and test pair combinations, check the intermediate results and the final output. Check if they are as expected.
-2) If the original viton results are not as expected, please check the issues raised in this GitHub repo, people have already found several issues, and see how they solved them.
-3) If the original viton test results are as expected, then run your custom test sets and check the intermediate results and debug where its going wrong.
-4) If you are testing with custom images then check the GitHub repository readme and related issues on how to run with custom images.
+#### **Prerequisites:**
 
-Its difficult to understand your issue from only single image/output. As I mentioned, there are various factors. Please debug yourself step by step and see where its going wrong. Check all the available intermediate/final inputs/outputs visually, and check multiple cases to see if the issue is happening for all cases. Good luck to you!
+- Python 3.6+
+- Git
+- `pipenv` (`pip install pipenv`)
+- An NVIDIA GPU with a compatible CUDA version installed is highly recommended.
 
+#### 1. Clone the Repository
 
-## Citation
-Please cite our paper in your publications if it helps your research:
+```bash
+git clone [repo-url]
+cd VTON-X
+```
+
+#### 2. Setup the Environment with Pipenv
+
+### TODO
+
+#### 4. Run the Try-On Inference
+
+The pipeline runs in two stages: GMM (warping the cloth) and TOM (generating the final image).
+
+```bash
+# Stage 1: Run the Geometric Matching Module (GMM)
+python test.py --name gmm_test --stage GMM --workers 4 --dataroot ./data --data_list test_pairs.txt --checkpoint checkpoints/gmm.pth
+
+# Stage 2: Run the Try-On Module (TOM)
+python test.py --name tom_test --stage TOM --workers 4 --dataroot ./data --data_list test_pairs.txt --checkpoint checkpoints/gen.pth
+```
+
+#### 5. View Your Results!
+
+The final images are saved in the `results/tom_test/test/try-on/` directory.
+
+---
+
+## Advanced Usage (Training)
+
+While this fork focuses on inference, the original training scripts are preserved. To train the models from scratch, please follow the logic from the original repository:
+
+1.  **Prepare Data:** Download the full `VITON_PLUS` dataset and prepare it in the `data` directory as described in the original `README`.
+2.  **Train GMM:** Run `train.py` for the GMM stage.
+    ```bash
+    pipenv shell
+    python train.py --name GMM_train --stage GMM --workers 4 --save_count 5000 --shuffle
+    ```
+3.  **Generate Warped Clothes:** Use the trained GMM to generate warped clothes for the training set by running `test.py`.
+4.  **Train TOM:** Run `train.py` for the TOM stage, using the newly generated warped clothes as input.
+    ```bash
+    pipenv shell
+    python train.py --name TOM_train --stage TOM --workers 4 --save_count 5000 --shuffle
+    ```
+
+## Using Custom Images
+
+To run the model on your own images, follow these steps:
+
+1.  **Prepare Inputs:** You need to generate several input files for each try-on pair. See the original authors' notes on this in the section below.
+    - `image` (person image, 256x192)
+    - `cloth` (clothing image, 256x192)
+    - `image-parse` (person segmentation map)
+    - `cloth-mask` (binary mask of the cloth)
+    - `pose` (pose keypoints JSON file)
+2.  **Organize Files:** Place your files in the corresponding subdirectories within the `data/` folder.
+3.  **Update Pair List:** Add a new line to `data/test_pairs.txt` with the filenames of your person image and cloth image (e.g., `my_photo.jpg my_shirt.png`).
+4.  **Run Inference:** Execute the commands from the **Quickstart** Step 4.
+
+> #### _Notes from the Original Authors on Custom Images:_
+>
+> - You can generate `image-parse` with pre-trained networks like [CIHP_PGN](https://github.com/Engineering-Course/CIHP_PGN) or [Graphonomy](https://github.com/Gaoyiminggithub/Graphonomy).
+> - `cloth-mask` can be generated with simple image processing functions in Pillow or OpenCV.
+> - `pose` keypoints can be generated using the official [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) repository (COCO-18 model).
+
+---
+
+## Citation & Acknowledgements
+
+This project would not be possible without the foundational work of the original `CP-VTON+` authors. If this code helps your research, please cite their paper:
+
 ```
 @InProceedings{Minar_CPP_2020_CVPR_Workshops,
 	title={CP-VTON+: Clothing Shape and Texture Preserving Image-Based Virtual Try-On},
@@ -78,5 +110,4 @@ Please cite our paper in your publications if it helps your research:
 }
 ```
 
-### Acknowledgements
-This implementation is largely based on the PyTorch implementation of [CP-VTON](https://github.com/sergeywong/cp-vton). We are extremely grateful for their public implementation.
+This implementation is also heavily based on the original [CP-VTON](https://github.com/sergeywong/cp-vton). We are extremely grateful for their public implementation, which laid the groundwork for this entire line of research.
