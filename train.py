@@ -55,7 +55,7 @@ def get_opt():
 
 
 def train_gmm(opt, train_loader, model, board):
-    model.cuda()
+    model
     model.train()
 
     # criterion
@@ -71,17 +71,18 @@ def train_gmm(opt, train_loader, model, board):
         iter_start_time = time.time()
         inputs = train_loader.next_batch()
 
-        im = inputs['image'].cuda()
-        im_pose = inputs['pose_image'].cuda()
-        im_h = inputs['head'].cuda()
-        shape = inputs['shape'].cuda()
-        agnostic = inputs['agnostic'].cuda()
-        c = inputs['cloth'].cuda()
-        cm = inputs['cloth_mask'].cuda()
-        im_c = inputs['parse_cloth'].cuda()
-        im_g = inputs['grid_image'].cuda()
+        im = inputs['image']
+        im_pose = inputs['pose_image']
+        im_h = inputs['head']
+        shape = inputs['shape']
+        agnostic = inputs['agnostic']
+        c = inputs['cloth']
+        cm = inputs['cloth_mask']
+        im_c = inputs['parse_cloth']
+        im_g = inputs['grid_image']
 
-        grid, theta = model(agnostic, cm)    # can be added c too for new training
+        # can be added c too for new training
+        grid, theta = model(agnostic, cm)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
         warped_mask = F.grid_sample(cm, grid, padding_mode='zeros')
         warped_grid = F.grid_sample(im_g, grid, padding_mode='zeros')
@@ -91,10 +92,11 @@ def train_gmm(opt, train_loader, model, board):
                    [warped_grid, (warped_cloth+im)*0.5, im]]
 
         # loss for warped cloth
-        Lwarp = criterionL1(warped_cloth, im_c)    # changing to previous code as it corresponds to the working code
+        # changing to previous code as it corresponds to the working code
+        Lwarp = criterionL1(warped_cloth, im_c)
         # Actual loss function as in the paper given below (comment out previous line and uncomment below to train as per the paper)
         # Lwarp = criterionL1(warped_mask, cm)    # loss for warped mask thanks @xuxiaochun025 for fixing the git code.
-        
+
         # grid regularization loss
         Lgic = gicloss(grid)
         # 200x200 = 40.000 * 0.001
@@ -121,7 +123,7 @@ def train_gmm(opt, train_loader, model, board):
 
 
 def train_tom(opt, train_loader, model, board):
-    model.cuda()
+    model
     model.train()
 
     # criterion
@@ -139,15 +141,15 @@ def train_tom(opt, train_loader, model, board):
         iter_start_time = time.time()
         inputs = train_loader.next_batch()
 
-        im = inputs['image'].cuda()
+        im = inputs['image']
         im_pose = inputs['pose_image']
         im_h = inputs['head']
         shape = inputs['shape']
 
-        agnostic = inputs['agnostic'].cuda()
-        c = inputs['cloth'].cuda()
-        cm = inputs['cloth_mask'].cuda()
-        pcm = inputs['parse_cloth_mask'].cuda()
+        agnostic = inputs['agnostic']
+        c = inputs['cloth']
+        cm = inputs['cloth_mask']
+        pcm = inputs['parse_cloth_mask']
 
         # outputs = model(torch.cat([agnostic, c], 1))  # CP-VTON
         outputs = model(torch.cat([agnostic, c, cm], 1))  # CP-VTON+
